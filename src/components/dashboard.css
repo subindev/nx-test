@@ -1,0 +1,22 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .truck-list-container {
+    width: auto;
+    max-width:350px;
+    background-color: #f5f5f5;
+  }
+  
+  .map-container {
+    flex: 1;
+    background-color: #eaeaea;
+  }
+  
+  .alarm-panel-container {
+    width: auto;
+    max-width:350px;
+    background-color: #f5f5f5;
+  }
+  
