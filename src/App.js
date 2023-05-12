@@ -1,11 +1,15 @@
-import './App.css';
-import Dashboard from './components/Dashboard';
+import "./App.css";
+import Dashboard from "./components/dashboard/Dashboard";
+import RealtimeContextProvider from "./realtime-context";
+// import SignalRComponent from './components/signalr-component';
 // import SignalRComponent from './components/signalr-component';
 
 function App() {
   return (
     <>
-     <Dashboard/>
+      <RealtimeContextProvider>
+        <Dashboard />
+      </RealtimeContextProvider>
     </>
   );
 }
