@@ -8,7 +8,7 @@ const SignalRComponent = () => {
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://pocsignalrfunction.azurewebsites.net/api')
+      .withUrl('https://gd-rms-fn.azurewebsites.net/api')
       .withAutomaticReconnect()
       .build();
 
@@ -21,10 +21,10 @@ const SignalRComponent = () => {
         .then(() => {
           console.log('SignalR Connected!');
 
-          connection.on('updateSales', message => {
+          connection.on('rmsReceived', message => {
             console.log('Message received:', message);
 
-            setMessages(prevMessages => [...prevMessages, message]);
+            // setMessages(prevMessages => [...prevMessages, message]);
           });
         })
         .catch(err => console.log('SignalR Connection Error: ', err));
