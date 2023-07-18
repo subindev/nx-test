@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 export const AppContext = createContext();
 
@@ -13,23 +13,28 @@ export const AppProvider = ({ children }) => {
     // Fetch user preferences based on the userId from the local state
     if (!userPreferences) {
       axios
-        .get(`https://gd-rms-api.azurewebsites.net/api/UserConfiguration/${user.id}`)
+        .get(
+          `https://gd-rms-api.azurewebsites.net/api/UserConfiguration/${user.id}`
+        )
         .then((userConfigResponse) => {
           setUserPreferences(userConfigResponse.data);
 
-          const assetTypeId = userConfigResponse.data.homeConfiguration.assetType.id;
+          const assetTypeId =
+            userConfigResponse.data.homeConfiguration.assetType.id;
           // Fetch assets based on the assetTypeId
           axios
-            .get(`https://gd-rms-api.azurewebsites.net/api/Asset?assetId=${assetTypeId}`)
+            .get(
+              `https://gd-rms-api.azurewebsites.net/api/Asset?assetId=${assetTypeId}`
+            )
             .then((assetResponse) => {
               setAssets(assetResponse.data);
             })
             .catch((error) => {
-              console.error('Error fetching assets:', error);
+              console.error("Error fetching assets:", error);
             });
         })
         .catch((error) => {
-          console.error('Error fetching user preferences:', error);
+          console.error("Error fetching user preferences:", error);
         });
     }
   }, [user, userPreferences]);
@@ -37,32 +42,46 @@ export const AppProvider = ({ children }) => {
   // Set up SignalR connection here
   useEffect(() => {
     const connection = new HubConnectionBuilder()
-      .withUrl('https://gd-rms-fn.azurewebsites.net/api')
+      .withUrl("https://gd-rms-fn.azurewebsites.net/api")
       .build();
 
-    connection.on('rmsReceived', (data) => {
-      // Update the relevant asset's parameter value in the assets state
-      setAssets((prevAssets) =>
-        prevAssets.map((asset) => {
-          // Check if the asset has the parameter with the matching deviceId and sensorId
-          const updatedParameters = asset.parameters.map((param) => {
-            if (param.deviceId === data.deviceId && param.sensorId === data.sensorId) {
-              // Update the parameter's value with the value from the SignalR data
-              return { ...param, value: parseFloat(data.values[param.id]?.Value) };
-            }
-            return param;
-          });
+      connection.on('rmsReceived', (data) => {
+        // Update the relevant asset's parameter value in the assets state
+        console.log("DATA", data);
+        setAssets((prevAssets) =>
+          prevAssets.map((asset) => {
+            // Check if the asset has the parameter with the matching deviceId and sensorId
+            const updatedParameters = asset.parameters.map((param) => {
+              console.log(param.name + "==" + param.parameterId);
+              console.log(param.deviceId + "==" + data.deviceId);
+              // console.log(param.sensorId + "==" + data.values[param.id]?.sensorId);
+              // if (param.deviceId === data.deviceId && param.parameterId === data.values[param.id]?.ParameterId) {
+              //   // Update the parameter's value with the value from the SignalR data
+              //   console.log("INSIDE", data.values);
+              //   return { ...param, value: parseFloat(data.values[param.id]?.Value) };
+              // }
+              return param;
+            });
+      
+            // Return the updated asset with the updated parameters
+            return { ...asset, parameters: updatedParameters };
+          })
+        );
+      });
+      
 
-          // Return the updated asset with the updated parameters
-          return { ...asset, parameters: updatedParameters };
-        })
+    connection
+      .start()
+      .catch((error) =>
+        console.error("Error starting SignalR connection:", error)
       );
-    });
-
-    connection.start().catch((error) => console.error('Error starting SignalR connection:', error));
 
     return () => {
-      connection.stop().catch((error) => console.error('Error stopping SignalR connection:', error));
+      connection
+        .stop()
+        .catch((error) =>
+          console.error("Error stopping SignalR connection:", error)
+        );
     };
   }, []);
 

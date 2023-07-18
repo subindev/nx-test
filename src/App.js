@@ -1,16 +1,12 @@
 import "./App.css";
+import { AppProvider } from "./AppContext";
 import Dashboard from "./components/dashboard/Dashboard";
-import RealtimeContextProvider from "./realtime-context";
-// import SignalRComponent from './components/signalr-component';
-// import SignalRComponent from './components/signalr-component';
 
 function App() {
   return (
-    <>
-      <RealtimeContextProvider>
-        <Dashboard />
-      </RealtimeContextProvider>
-    </>
+    <AppProvider>
+      <Dashboard />
+    </AppProvider>
   );
 }
 

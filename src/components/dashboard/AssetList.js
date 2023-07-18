@@ -1,6 +1,6 @@
 import './asset-list.css';
 import React, { useContext } from 'react';
-import AppContext from '../AppContext';
+import AppContext from '../../AppContext';
 
 const AssetList = () => {
   const { assets, userPreferences } = useContext(AppContext);
